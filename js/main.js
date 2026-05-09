@@ -99,4 +99,37 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Start animation loop
     requestAnimationFrame(animate);
+
+    // Mobile Menu Toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navbarMenu = document.getElementById('navbarMenu');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const iconMenu = document.querySelector('.icon-menu');
+    const iconClose = document.querySelector('.icon-close');
+
+    if (mobileMenuToggle && navbarMenu) {
+        mobileMenuToggle.addEventListener('click', () => {
+            navbarMenu.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('menu-open');
+            
+            // Toggle icons
+            if (navbarMenu.classList.contains('active')) {
+                iconMenu.style.display = 'none';
+                iconClose.style.display = 'block';
+            } else {
+                iconMenu.style.display = 'block';
+                iconClose.style.display = 'none';
+            }
+        });
+
+        // Close menu when clicking a link
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navbarMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('menu-open');
+                iconMenu.style.display = 'block';
+                iconClose.style.display = 'none';
+            });
+        });
+    }
 });
