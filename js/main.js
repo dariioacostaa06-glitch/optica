@@ -9,96 +9,54 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Infinite Scroll Gallery Setup
-    const track = document.getElementById('galleryTrack');
-    
-    // Using the 5 provided images, repeating them to create a sequence of 10
-    const imageUrls = [
-        'assets/images/optica_frame_1.png',
-        'assets/images/optica_sunglasses_1.png',
-        'assets/images/optica_hearing_aid.png',
-        'assets/images/optica_frame_2.png',
-        'assets/images/optica_sunglasses_2.png',
-        'assets/images/optica_frame_1.png',
-        'assets/images/optica_sunglasses_1.png',
-        'assets/images/optica_hearing_aid.png',
-        'assets/images/optica_frame_2.png',
-        'assets/images/optica_sunglasses_2.png',
-    ];
+    // Hero Slider Setup
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    let currentSlide = 0;
+    let slideInterval;
 
-    // Inject images into track
-    imageUrls.forEach(url => {
-        const item = document.createElement('div');
-        item.classList.add('gallery-item');
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = 'Producto Hidalgo Luna';
-        item.appendChild(img);
-        track.appendChild(item);
-    });
-    
-    // Clone track content to make an infinite seamless loop
-    const itemsHTML = track.innerHTML;
-    track.innerHTML += itemsHTML;
-
-    // Animation variables
-    let currentX = 0;
-    let baseSpeed = 0.5; // slow drift
-    let currentSpeed = baseSpeed;
-    let targetSpeed = baseSpeed;
-    let isHovered = false;
-    
-    // Increase speed slightly when scrolling
-    let lastScrollY = window.scrollY;
-    
-    window.addEventListener('scroll', () => {
-        let currentScrollY = window.scrollY;
-        let diff = currentScrollY - lastScrollY;
+    function changeSlide(index) {
+        // Remove active class from current
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
         
-        if (Math.abs(diff) > 0) {
-            targetSpeed = baseSpeed + (Math.abs(diff) * 0.1);
-            if (targetSpeed > 10) targetSpeed = 10;
-        }
+        // Update current index
+        currentSlide = index;
         
-        lastScrollY = currentScrollY;
-        
-        clearTimeout(window.scrollTimeout);
-        window.scrollTimeout = setTimeout(() => {
-            targetSpeed = baseSpeed;
-        }, 150);
-    });
-
-    // Pause on hover
-    const allItems = document.querySelectorAll('.gallery-item');
-    allItems.forEach(item => {
-        item.addEventListener('mouseenter', () => {
-            isHovered = true;
-        });
-        item.addEventListener('mouseleave', () => {
-            isHovered = false;
-        });
-    });
-
-    function animate() {
-        if (!isHovered) {
-            // Smoothly ease back to base speed
-            currentSpeed += (targetSpeed - currentSpeed) * 0.05;
-            currentX -= currentSpeed;
-            
-            // Loop reset: since we duplicated the items, resetting at half width creates a seamless loop
-            const trackWidth = track.scrollWidth / 2;
-            if (Math.abs(currentX) >= trackWidth) {
-                currentX = 0;
-            }
-            
-            track.style.transform = `translate3d(${currentX}px, 0, 0)`;
-        }
-        
-        requestAnimationFrame(animate);
+        // Add active class to new
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
     }
-    
-    // Start animation loop
-    requestAnimationFrame(animate);
+
+    function nextSlide() {
+        let next = (currentSlide + 1) % slides.length;
+        changeSlide(next);
+    }
+
+    function startSlider() {
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function resetSlider() {
+        clearInterval(slideInterval);
+        startSlider();
+    }
+
+    // Initialize slider dots click events
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            if (index !== currentSlide) {
+                changeSlide(index);
+                resetSlider();
+            }
+        });
+    });
+
+    // Start auto slider
+    if(slides.length > 0) {
+        startSlider();
+    }
 
     // Mobile Menu Toggle
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
